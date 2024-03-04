@@ -35,6 +35,7 @@ public class ViewCheckingAccountPage extends BasePage {
         double actualBalanceText = Double.parseDouble(firstRowColumns.get(4).getText().substring(1));
 */
         Map<String,String> actualResultMap = new TreeMap<>();
+        actualResultMap.put("actualDate",firstRowColumns.get(0).getText());
         actualResultMap.put("actualCategory",firstRowColumns.get(1).getText());
         actualResultMap.put("actualDescription", firstRowColumns.get(2).getText());
         actualResultMap.put("actualAmountText",firstRowColumns.get(3).getText().substring(1));

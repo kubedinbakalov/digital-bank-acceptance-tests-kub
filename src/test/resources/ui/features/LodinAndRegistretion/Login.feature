@@ -1,5 +1,5 @@
 Feature: login
-
+@Smoke
   Scenario: Positive login
     Given the user is on the home page
     And the user populates the username field with "email@gmail.com"

@@ -2,12 +2,9 @@ package co.wedevx.digitalbank.automation.ui.steps;
 
 import co.wedevx.digitalbank.automation.ui.pages.RegistrationPage;
 import co.wedevx.digitalbank.automation.ui.utils.ConfigReader;
-import co.wedevx.digitalbank.automation.ui.utils.Driver;
-import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.github.bonigarcia.wdm.WebDriverManager;
 
 import java.util.List;
 import java.util.Map;

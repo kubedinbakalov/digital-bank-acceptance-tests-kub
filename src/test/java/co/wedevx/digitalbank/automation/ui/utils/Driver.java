@@ -11,8 +11,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 
 public class Driver {
@@ -23,7 +27,8 @@ public class Driver {
         if (driver == null){
             switch (ConfigReader.getPropertiesValue("browser").toLowerCase()) {
                 case"chrome":
-                    WebDriverManager.chromedriver().setup();
+                   // WebDriverManager.chromedriver().setup();
+                    System.setProperty("webdriver.chrome.drive","https://storage.googleapis.com/chrome-for-testing-public/121.0.6167.184/mac-x64/chrome-mac-x64.zip");
                     driver = new ChromeDriver();
                     break;
                 case "firefox":
@@ -35,7 +40,10 @@ public class Driver {
                     driver =  new SafariDriver();
                     break;
                 case "headless":
-                    ChromeDriverManager.getInstance(DriverManagerType.CHROME).setup();
+
+                    System.setProperty("webdriver.chrome.drive","https://storage.googleapis.com/chrome-for-testing-public/121.0.6167.184/mac-x64/chrome-mac-x64.zip");
+
+                   // ChromeDriverManager.getInstance(DriverManagerType.CHROME).setup();
                     ChromeOptions chromeOptions = new ChromeOptions();
 
                     chromeOptions.addArguments("--window-size=1920,1080");
@@ -47,6 +55,19 @@ public class Driver {
                     chromeOptions.addArguments("--headless");
 
                     driver = new ChromeDriver(chromeOptions);
+                    break;
+
+                case "saucelabs":
+                    //1 we use configReader and properties
+                    //  String platform = ConfigReader.getPropertiesValue("dbank.saucelabs.platform");
+                    //  String browser = ConfigReader.getPropertiesValue("dbank.saucelabs.browser");
+                    //  String browserVersion = ConfigReader.getPropertiesValue("dbank.saucelabs.browser.version");
+                    // 2 we use Edit Configuration(Run/Debug Configuration) Feature or folder path
+                    String platform = System.getProperty("dbank.saucelabs.platform");
+                    String browser = System.getProperty("dbank.saucelabs.browser");
+                    String browserVersion = System.getProperty("dbank.saucelabs.browser.version");
+
+                    driver = loadSauceLabs(platform,browser,browserVersion);
                     break;
 
                 case "ie":
@@ -68,10 +89,39 @@ public class Driver {
             scenario.attach(screenshot,"image/png","screenshot");
         }
     }
-    public static void closeDriver(){
-        if (driver != null){
+    public static void closeDriver() {
+        if (driver != null) {
             driver.quit();
             driver = null;
         }
     }
-}
+
+        private static WebDriver loadSauceLabs(String platform, String browser, String browserVersion) {
+
+            //How to use SauceLabs
+            //First get sauceLabs userName and access key
+
+            String USERNAME = ConfigReader.getPropertiesValue("dbank.saucelabs.username");
+            String ACCESS_KEY = ConfigReader.getPropertiesValue("dbank.saucelabs.accesskey");
+            String HOST = ConfigReader.getPropertiesValue("dbank.saucelabs.host");
+
+            //setup url to the hub which is running on sauceLabs VMs.
+
+            String url = "https://" + USERNAME + ":" + ACCESS_KEY + "@" + HOST;
+
+            DesiredCapabilities capabilities = new DesiredCapabilities();
+
+            capabilities.setCapability("platformName", platform);
+            capabilities.setCapability("browserName", browser);
+            capabilities.setCapability("browserVersion",browserVersion);
+
+            WebDriver driver = null;
+            try {
+                driver = new RemoteWebDriver(new URL(url), capabilities);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            return driver;
+        }
+    }
+
